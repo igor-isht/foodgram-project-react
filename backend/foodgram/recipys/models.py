@@ -1,6 +1,6 @@
-from django.db import models
-from django.core.validators import MinValueValidator
 from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator
+from django.db import models
 
 User = get_user_model()
 
@@ -10,6 +10,7 @@ class Ingredient(models.Model):
     measurement_unit = models.CharField('единицы измерения', max_length=200)
 
     class Meta:
+        ordering = ['name']
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
 
@@ -19,11 +20,16 @@ class Tag(models.Model):
     color = models.CharField('цвет', max_length=7, null=True, unique=True)
     slug = models.SlugField('слаг', max_length=200, unique=True)
 
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'Тег'
+        verbose_name_plural = 'Теги'
+
 
 class Recipy(models.Model):
     name = models.CharField('название блюда', max_length=200)
     text = models.TextField('подробное описание')
-    image = models.ImageField('изображение', upload_to='recipes/',) 
+    image = models.ImageField('изображение', upload_to='recipes/',)
     pub_date = models.DateTimeField('дата добавления', auto_now_add=True)
     author = models.ForeignKey(
         User,
@@ -69,7 +75,8 @@ class IngredientsForRecipy(models.Model):
         related_name='ingredient',
         verbose_name='ингредиенты'
     )
-    amount = models.PositiveSmallIntegerField('количество',
+    amount = models.PositiveSmallIntegerField(
+        'количество',
         validators=[MinValueValidator(
             1,
             message='Мин. количество ингредиента - 1 ед'
@@ -81,7 +88,7 @@ class IngredientsForRecipy(models.Model):
             fields=['recipy', 'ingredient'],
             name='unique_ingredients_list'
         )]
-        verbose_name = 'ингредиент для рецепте'
+        verbose_name = 'ингредиент для рецепта'
         verbose_name_plural = 'ингредиенты для рецепта'
 
 
@@ -97,7 +104,6 @@ class Favorite(models.Model):
         related_name='favorite',
         verbose_name='добавленный в избранное рецепт'
     )
-    # is_favorite = models.BooleanField(default=False)
 
     class Meta:
         constraints = [
@@ -106,7 +112,9 @@ class Favorite(models.Model):
                 name='unique_favorite'
             )
         ]
-
+        ordering = ['-id']
+        verbose_name = 'избранный рецепт'
+        verbose_name_plural = 'избранные рецепты'
 
 
 class Basket(models.Model):
@@ -128,3 +136,6 @@ class Basket(models.Model):
             fields=['user', 'recipy'],
             name='unique_basket'
         )]
+        ordering = ['-id']
+        verbose_name = 'рецепт в корзине'
+        verbose_name_plural = 'рецепты в корзине'

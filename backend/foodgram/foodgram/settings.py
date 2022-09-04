@@ -1,6 +1,5 @@
 import os
 
-from datetime import timedelta
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -31,6 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_filters',
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
@@ -114,8 +114,7 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.2/howto/static-files/
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 STATIC_URL = '/static/'
 
@@ -124,25 +123,22 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 AUTH_USER_MODEL = 'users.User'
 
-
-
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
-        # 'rest_framework.permissions.AllowAny', 
     ],
 
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
+    'DEFAULT_PAGINATION_CLASS': 'api.paginations.PageNumberPagination',
+    'PAGE_SIZE': 6
 }
 
 
 DJOSER = {
     'SERIALIZERS': {
         'user': 'djoser.serializers.UserSerializer',
-        # 'user_create': 'api.serializers.UserSerializer',
-        # 'current_user': 'api.serializers.UserSerializer',
     },
     'PERMISSIONS': {
         'user_list': ('rest_framework.permissions.AllowAny',),

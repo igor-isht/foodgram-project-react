@@ -1,6 +1,7 @@
 from django.contrib import admin
-from .models import (Ingredient, Tag, Recipy, IngredientsForRecipy,
-                     Favorite, Basket)
+
+from .models import (Basket, Favorite, Ingredient, IngredientsForRecipy,
+                     Recipy, Tag)
 
 
 class RecipyAdmin(admin.ModelAdmin):

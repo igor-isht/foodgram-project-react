@@ -1,28 +1,27 @@
 from http import HTTPStatus
 
 from django.http import HttpResponse
+from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
+from recipys.models import Basket, Favorite, Ingredient, Recipy, Tag
+from rest_framework import filters, mixins, viewsets
 from rest_framework.decorators import api_view
-from rest_framework import viewsets
-from rest_framework import mixins
-from rest_framework.permissions import (SAFE_METHODS, AllowAny,
-                                        IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly)
+from rest_framework.permissions import SAFE_METHODS
 from rest_framework.response import Response
 
-from recipys.models import Ingredient, Tag, Recipy, Favorite, Basket
-from users.models import User, Follow
-from .serializers import (IngredientSerializer, TagSerializer, ReadRecipySerializer,
-                          UserSerializer, FollowSerializer, SubscribeSerializer,
-                          PostRecipySerializer, FavoriteSerializer, BriefRecipySerializer,
-                          ShoppingCart, IngredientsForRecipy)
-
-
+from users.models import Follow, User
+from .permissions import AdminPermission, AuthorOrReadOnly
+from .serializers import (BriefRecipySerializer, FavoriteSerializer,
+                          FollowSerializer, IngredientSerializer,
+                          IngredientsForRecipy, PostRecipySerializer,
+                          ReadRecipySerializer, ShoppingCart,
+                          SubscribeSerializer, TagSerializer, UserSerializer)
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [AdminPermission | AuthorOrReadOnly]
 
 
 class FollowViewSet(viewsets.ReadOnlyModelViewSet):
@@ -36,15 +35,22 @@ class FollowViewSet(viewsets.ReadOnlyModelViewSet):
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
+    pagination_class = None
+    filter_backends = (filters.SearchFilter,)
+    search_field = ('name',)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+    pagination_class = None
 
 
 class RecipyVeiwSet(viewsets.ModelViewSet):
     queryset = Recipy.objects.all()
+    permission_classes = [AdminPermission | AuthorOrReadOnly]
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('author', 'tags')
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
@@ -55,9 +61,9 @@ class RecipyVeiwSet(viewsets.ModelViewSet):
 
 class CreateDestroyViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
                            viewsets.GenericViewSet):
-    # для создания/удаления подписок, избраного, покупок
+    """ Вьюсет для создания/удаления подписок, избранного, корзины продуктов"""
     pass
-    
+
 
 class SubscribeViewSet(CreateDestroyViewSet):
     serializer_class = SubscribeSerializer
@@ -134,6 +140,7 @@ class FavoriteViewSet(CreateDestroyViewSet):
         ).delete()
         return Response(status=HTTPStatus.NO_CONTENT)
 
+
 class ShoppingCartViewSet(CreateDestroyViewSet):
     serializer_class = ShoppingCart
 
@@ -171,6 +178,7 @@ class ShoppingCartViewSet(CreateDestroyViewSet):
         ).delete()
         return Response(status=HTTPStatus.NO_CONTENT)
 
+
 @api_view()
 def DownloadShoppingCart(request):
     baskets = Basket.objects.filter(user=request.user)
@@ -179,7 +187,7 @@ def DownloadShoppingCart(request):
         for ingredient in basket.recipy.ingredients.all():
             amount = get_object_or_404(
                 IngredientsForRecipy,
-                recipy = basket.recipy,
+                recipy=basket.recipy,
                 ingredient=ingredient
             ).amount
             if ingredient.name not in cart_list:

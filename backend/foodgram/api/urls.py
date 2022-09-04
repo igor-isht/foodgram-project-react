@@ -1,15 +1,14 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from .views import (IngredientViewSet, TagViewSet, RecipyVeiwSet,
-                    ShoppingCartViewSet, FollowViewSet, FavoriteViewSet,
-                    SubscribeViewSet, DownloadShoppingCart)
+from .views import (DownloadShoppingCart, FavoriteViewSet, FollowViewSet,
+                    IngredientViewSet, RecipyVeiwSet, ShoppingCartViewSet,
+                    SubscribeViewSet, TagViewSet)
 
 router = DefaultRouter()
 router.register(r'ingredients', IngredientViewSet)
 router.register(r'tags', TagViewSet)
 router.register(r'recipes', RecipyVeiwSet)
-
 
 urlpatterns = [
     path(
@@ -44,11 +43,7 @@ urlpatterns = [
         }),
         name='favorite'),
 
-
-    
     path('', include('djoser.urls')),
     path('', include(router.urls)),
     path(r'auth/', include('djoser.urls.authtoken')),
 ]
-
-

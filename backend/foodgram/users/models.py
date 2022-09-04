@@ -3,21 +3,20 @@ from django.db import models
 
 
 class User(AbstractUser):
-    USER = 'user'
-    MODERATOR = 'moderator'
-    ROLES = ((USER, 'USER'), (MODERATOR, 'MODERATOR'))
 
-    email = models.EmailField(max_length=254, unique=True)
-    username = models.CharField(max_length=150, unique=True)
-    first_name = models.CharField(max_length=150)
-    last_name = models.CharField(max_length=150)
-    role = models.CharField(max_length=20, choices=ROLES, default=ROLES[0][0])
+    email = models.EmailField('электронная почта',
+                              max_length=254, unique=True)
+    username = models.CharField('логин', max_length=150, unique=True)
+    first_name = models.CharField('имя', max_length=150)
+    last_name = models.CharField('фамилия', max_length=150)
+    is_superuser = models.BooleanField('является администатором')
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'username']
 
-    @property
-    def is_moderator(self):
-        return self.role == self.MODERATOR
+    class Meta:
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
 
     def __str__(self):
         return self.username
@@ -42,3 +41,5 @@ class Follow(models.Model):
             fields=['user', 'author'],
             name='unique_following'
         )]
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
