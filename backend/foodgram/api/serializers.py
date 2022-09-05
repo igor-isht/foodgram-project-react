@@ -129,8 +129,6 @@ class ReadRecipySerializer(serializers.ModelSerializer):
 
     def get_is_favorited(self, obj):
         request = self.context.get('request')
-        if request.user.is_anonymous:
-            return False
         return (
                 request.user.is_authenticated
                 and Favorite.objects.filter(
@@ -141,8 +139,6 @@ class ReadRecipySerializer(serializers.ModelSerializer):
 
     def get_is_in_shopping_cart(self, obj):
         request = self.context.get('request')
-        if request.user.is_anonymous:
-            return False
         return (
                 request.user.is_authenticated
                 and Basket.objects.filter(
@@ -163,6 +159,25 @@ class PostRecipySerializer(serializers.ModelSerializer):
         model = Recipy
         fields = ('id', 'tags', 'author', 'name', 'ingredients',
                   'image', 'text', 'cooking_time')
+
+    def validate_ingredients(self, value):
+        ingredients = value
+        ingredients_list = []
+        for ingredient in ingredients:
+            if ingredient['amount'] < 1:
+                raise serializers.ValidationError(
+                    'Проверьте количество ингредиентов')
+            if ingredient['ingredient'] in ingredients_list:
+                raise serializers.ValidationError(
+                    'Ингредиенты повторяются')
+            ingredients_list.append(ingredient['ingredient'])
+        return value
+
+    def validate_cooking_time(self, value):
+        if int(value) < 1:
+            raise serializers.ValidationError(
+                    'Проверьте время приготовления')
+        return value
 
     def create_ingredients_for_recipy(self, recipy, ingredients):
         for ingredient in ingredients:
@@ -193,7 +208,10 @@ class PostRecipySerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
     def to_representation(self, instance):
-        return ReadRecipySerializer(instance).data
+        context = {
+            'request': self.context.get('request')
+        }
+        return ReadRecipySerializer(instance, context=context).data
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
@@ -201,11 +219,20 @@ class FavoriteSerializer(serializers.ModelSerializer):
         model = Favorite
         fields = '__all__'
 
+    def validate(self, attrs):
+        return super().validate(attrs)
+
 
 class SubscribeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Follow
         fields = '__all__'
+
+    def validate_subscribe(self, author):
+        if author == self.context['request'].user:
+            raise serializers.ValidationError(
+                'Нельзя подписаться на самого cебя!')
+        return author
 
 
 class ShoppingCart(serializers.ModelSerializer):

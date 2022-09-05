@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.core.validators import MinValueValidator
 from django.db import models
 
 User = get_user_model()
@@ -24,6 +23,9 @@ class Tag(models.Model):
         ordering = ['name']
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
+
+    def __str__(self):
+        return self.slug
 
 
 class Recipy(models.Model):
@@ -50,10 +52,6 @@ class Recipy(models.Model):
     )
     cooking_time = models.PositiveSmallIntegerField(
         'время приготовления',
-        validators=[MinValueValidator(
-            1,
-            message='Мин. время приготовления 1 минута'
-        )]
     )
 
     class Meta:
@@ -77,10 +75,6 @@ class IngredientsForRecipy(models.Model):
     )
     amount = models.PositiveSmallIntegerField(
         'количество',
-        validators=[MinValueValidator(
-            1,
-            message='Мин. количество ингредиента - 1 ед'
-        )]
     )
 
     class Meta:
