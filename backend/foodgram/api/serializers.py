@@ -1,8 +1,8 @@
 from drf_extra_fields.fields import Base64ImageField
-from recipys.models import (Basket, Favorite, Ingredient, IngredientsForRecipy,
-                            Recipy, Tag)
 from rest_framework import serializers
 
+from recipys.models import (Basket, Favorite, Ingredient, IngredientsForRecipy,
+                            Recipy, Tag)
 from users.models import Follow, User
 
 
@@ -37,8 +37,8 @@ class FollowSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source='author.id')
     username = serializers.ReadOnlyField(source='author.username')
     first_name = serializers.ReadOnlyField(source='author.first_name')
-    is_subscribed = serializers.SerializerMethodField()
     last_name = serializers.ReadOnlyField(source='author.last_name')
+    is_subscribed = serializers.SerializerMethodField()
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
 
@@ -89,6 +89,8 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class IngredientsForRecipyEditSerializer(serializers.ModelSerializer):
+    """ Сериализатор для игредиентов при создании/редактировании рецептов. """
+
     id = serializers.IntegerField(source='ingredient.id')
     amount = serializers.IntegerField()
 
@@ -98,6 +100,8 @@ class IngredientsForRecipyEditSerializer(serializers.ModelSerializer):
 
 
 class IngredientsForRecipySerializer(serializers.ModelSerializer):
+    """ Сериализатор для игредиентов для GET запросов. """
+
     id = serializers.IntegerField(read_only=True,
                                   source='ingredient.id')
     name = serializers.CharField(read_only=True,
@@ -113,6 +117,8 @@ class IngredientsForRecipySerializer(serializers.ModelSerializer):
 
 
 class ReadRecipySerializer(serializers.ModelSerializer):
+    """ Для рецептов в GET запросах. """
+
     tags = TagSerializer(many=True, read_only=True)
     author = UserSerializer(read_only=True)
     ingredients = IngredientsForRecipySerializer(
@@ -149,6 +155,8 @@ class ReadRecipySerializer(serializers.ModelSerializer):
 
 
 class PostRecipySerializer(serializers.ModelSerializer):
+    """ Для создания/редактирования рецептов. """
+
     author = UserSerializer(read_only=True)
     image = Base64ImageField()
     ingredients = IngredientsForRecipyEditSerializer(

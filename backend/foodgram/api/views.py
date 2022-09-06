@@ -3,14 +3,14 @@ from http import HTTPStatus
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
-from recipys.models import Basket, Favorite, Ingredient, Recipy, Tag
 from rest_framework import mixins, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.permissions import SAFE_METHODS
 from rest_framework.response import Response
 
 from users.models import Follow, User
-from .filter import IngredientFilter
+from recipys.models import Basket, Favorite, Ingredient, Recipy, Tag
+from .filter import IngredientFilter, RecipyFilter
 from .permissions import AdminPermission, AuthorOrReadOnly
 from .serializers import (BriefRecipySerializer, FavoriteSerializer,
                           FollowSerializer, IngredientSerializer,
@@ -37,8 +37,8 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
-    filter_backends = (DjangoFilterBackend, IngredientFilter)
-    search_fields = (r'^name',)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = IngredientFilter
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -50,11 +50,8 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 class RecipyVeiwSet(viewsets.ModelViewSet):
     queryset = Recipy.objects.all()
     permission_classes = [AdminPermission | AuthorOrReadOnly]
-    pagination_class = None
-    # filter_backends = (DjangoFilterBackend, filters.SearchFilter)
-    # filter_backends = (filters.SearchFilter,)
-    # filterset_fields = ('author__recipy', 'tags__recipy')
-    # search_fields = ('author', 'tags')
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = RecipyFilter
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
@@ -65,7 +62,7 @@ class RecipyVeiwSet(viewsets.ModelViewSet):
 
 class CreateDestroyViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
                            viewsets.GenericViewSet):
-    """ Вьюсет для создания/удаления подписок, избранного, корзины продуктов"""
+    """Вьюсет для создания/удаления подписок, избранного, корзины продуктов."""
     pass
 
 
@@ -93,7 +90,7 @@ class SubscribeViewSet(CreateDestroyViewSet):
                 'Вы уже подписаны на этого автора!',
                 status=HTTPStatus.BAD_REQUEST
             )
-            
+
         follow = Follow.objects.create(
             user=self.request.user,
             author=author
