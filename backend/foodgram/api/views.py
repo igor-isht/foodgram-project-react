@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from queue import Empty
 
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
@@ -23,6 +24,17 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [AdminPermission | AuthorOrReadOnly]
+
+    def create(self, validated_data):
+        user = User(
+            email=validated_data['email'],
+            username=validated_data['username'],
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name']
+        )
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
 
 
 class FollowViewSet(viewsets.ReadOnlyModelViewSet):
@@ -52,12 +64,60 @@ class RecipyVeiwSet(viewsets.ModelViewSet):
     permission_classes = [AdminPermission | AuthorOrReadOnly]
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipyFilter
+    serializer_class = ReadRecipySerializer
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
             return ReadRecipySerializer
         else:
             return PostRecipySerializer
+
+    def create_ingredients_for_recipy(self, recipy, ingredients):
+        recipy_list = []
+        for ingredient in ingredients:
+            ingredients_for_recipy = IngredientsForRecipy(
+                recipy=recipy,
+                ingredient_id=ingredient.get('ingredient').get('id'),
+                amount=ingredient.get('amount')
+            )
+            recipy_list.append(ingredients_for_recipy)
+        IngredientsForRecipy.objects.bulk_create(recipy_list)
+
+    def create(self, request, *args, **kwargs):
+        author = self.request.user
+        serializer = PostRecipySerializer(data=request.data)
+        if serializer.is_valid():
+            tags = serializer.validated_data.pop('tags')
+            ingredients = serializer.validated_data.pop('recipy')
+            recipy = Recipy.objects.create(author=author, **serializer.validated_data)
+            recipy.tags.set(tags)
+            self.create_ingredients_for_recipy(recipy, ingredients)
+
+        context = {'request': self.request}
+        serializer = ReadRecipySerializer(instance = recipy, context=context)
+        return Response(
+            data=serializer.data,
+            status=HTTPStatus.CREATED
+        )
+
+    def update(self, request, *args, **kwargs):
+        author = self.request.user
+        serializer = PostRecipySerializer(data=request.data)
+        if serializer.is_valid():
+            tags = serializer.validated_data.pop('tags')
+            ingredients = serializer.validated_data.pop('recipy')
+            recipy = Recipy.objects.create(author=author, **serializer.validated_data)
+            recipy = get_object_or_404(Recipy, id=self.kwargs.get('pk'))
+            IngredientsForRecipy.objects.filter(recipy=recipy).delete()
+            recipy.tags.set(tags)
+            self.create_ingredients_for_recipy(recipy, ingredients)
+
+        context = {'request': self.request}
+        serializer = ReadRecipySerializer(instance = recipy, context=context)
+        return Response(
+            data=serializer.data,
+            status=HTTPStatus.CREATED
+        )
 
 
 class CreateDestroyViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
@@ -210,12 +270,15 @@ def DownloadShoppingCart(request):
                 cart_list[ingredient.name] += amount
 
     content = 'Список покупок:\n\n'
+    if not cart_list:
+        content += 'Корзина пуста!'
     for item in cart_list:
         measurement_unit = get_object_or_404(
             Ingredient,
             name=item
         ).measurement_unit
         content += f'{item}: {cart_list[item]} {measurement_unit}\n'
+
     response = HttpResponse(
         content, content_type='text/plain,charset=utf8'
     )

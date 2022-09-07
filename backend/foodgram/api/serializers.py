@@ -14,17 +14,6 @@ class UserSerializer(serializers.ModelSerializer):
         )
         extra_kwargs = {'password': {'write_only': True}}
 
-    def create(self, validated_data):
-        user = User(
-            email=validated_data['email'],
-            username=validated_data['username'],
-            first_name=validated_data['first_name'],
-            last_name=validated_data['last_name']
-        )
-        user.set_password(validated_data['password'])
-        user.save()
-        return user
-
 
 class BriefRecipySerializer(serializers.ModelSerializer):
     class Meta:
@@ -136,12 +125,12 @@ class ReadRecipySerializer(serializers.ModelSerializer):
     def get_is_favorited(self, obj):
         request = self.context.get('request')
         return (
-                request.user.is_authenticated
-                and Favorite.objects.filter(
-                    user=request.user,
-                    recipy_id=obj.id
-                ).exists()
-        )
+                    request.user.is_authenticated
+                    and Favorite.objects.filter(
+                        user=request.user,
+                        recipy_id=obj.id
+                    ).exists()
+            )
 
     def get_is_in_shopping_cart(self, obj):
         request = self.context.get('request')
@@ -152,7 +141,6 @@ class ReadRecipySerializer(serializers.ModelSerializer):
                     recipy_id=obj.id
                 ).exists()
         )
-
 
 class PostRecipySerializer(serializers.ModelSerializer):
     """ Для создания/редактирования рецептов. """
@@ -186,40 +174,6 @@ class PostRecipySerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                     'Проверьте время приготовления')
         return value
-
-    def create_ingredients_for_recipy(self, recipy, ingredients):
-        for ingredient in ingredients:
-            IngredientsForRecipy.objects.create(
-                recipy=recipy,
-                ingredient_id=ingredient.get('ingredient').get('id'),
-                amount=ingredient.get('amount')
-            )
-
-    def create(self, validated_data):
-        author = self.context.get('request').user
-        tags = validated_data.pop('tags')
-        ingredients = validated_data.pop('recipy')
-        recipy = Recipy.objects.create(author=author, **validated_data)
-        recipy.tags.set(tags)
-        recipy.save()
-        self.create_ingredients_for_recipy(recipy, ingredients)
-        return recipy
-
-    def update(self, instance, validated_data):
-        if 'recipy' in validated_data:
-            ingredients = validated_data.pop('recipy')
-            IngredientsForRecipy.objects.filter(recipy=instance).delete()
-            self.create_ingredients_for_recipy(instance, ingredients)
-        if 'tags' in validated_data:
-            tags = validated_data.pop('tags')
-            instance.tags.set(tags)
-        return super().update(instance, validated_data)
-
-    def to_representation(self, instance):
-        context = {
-            'request': self.context.get('request')
-        }
-        return ReadRecipySerializer(instance, context=context).data
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
