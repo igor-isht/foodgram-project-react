@@ -66,12 +66,6 @@ class RecipyVeiwSet(viewsets.ModelViewSet):
     filterset_class = RecipyFilter
     serializer_class = ReadRecipySerializer
 
-    def get_serializer_class(self):
-        if self.request.method in SAFE_METHODS:
-            return ReadRecipySerializer
-        else:
-            return PostRecipySerializer
-
     def create_ingredients_for_recipy(self, recipy, ingredients):
         recipy_list = []
         for ingredient in ingredients:
