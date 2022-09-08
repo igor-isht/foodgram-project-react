@@ -2,15 +2,16 @@ from http import HTTPStatus
 from queue import Empty
 
 from django.http import HttpResponse
-from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.permissions import SAFE_METHODS
 from rest_framework.response import Response
 
-from users.models import Follow, User
 from recipys.models import Basket, Favorite, Ingredient, Recipy, Tag
+from users.models import Follow, User
+
 from .filter import IngredientFilter, RecipyFilter
 from .permissions import AdminPermission, AuthorOrReadOnly
 from .serializers import (BriefRecipySerializer, FavoriteSerializer,
