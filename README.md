@@ -1,3 +1,5 @@
+[![Foodgram workflow](https://github.com/igor-isht/foodgram-project-react/actions/workflows/main.yml/badge.svg?branch=master&event=push)](https://github.com/igor-isht/foodgram-project-react/actions/workflows/main.yml)
+
 ## Описание:
 
 Foodgram - API к онлайн-сервису рецептов/продуктового помощника. На этом сервисе пользователи могут публиковать рецепты, 
@@ -47,7 +49,7 @@ docker-compose exec web python manage.py migrate
 docker-compose exec web python manage.py collectstatic --no-input
 
 ```
-Готова. Перейдите на [localhost](http://localhost) 
+Готово! Сайт развернулся на [localhost](http://localhost) 
 
 
 ## Авторы
