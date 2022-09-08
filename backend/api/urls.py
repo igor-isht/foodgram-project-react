@@ -1,7 +1,7 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from .views import (DownloadShoppingCart, FavoriteViewSet, FollowViewSet,
+from .views import (download_shopping_cart, FavoriteViewSet, FollowViewSet,
                     IngredientViewSet, RecipyVeiwSet, ShoppingCartViewSet,
                     SubscribeViewSet, TagViewSet)
 
@@ -27,7 +27,7 @@ urlpatterns = [
         name='shopping_cart'),
     path(
         'recipes/download_shopping_cart/',
-        DownloadShoppingCart,
+        download_shopping_cart,
         name='download_shopping_cart'
     ),
     path(

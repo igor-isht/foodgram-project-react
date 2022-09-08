@@ -89,7 +89,7 @@ class RecipyVeiwSet(viewsets.ModelViewSet):
             self.create_ingredients_for_recipy(recipy, ingredients)
 
         context = {'request': self.request}
-        serializer = ReadRecipySerializer(instance = recipy, context=context)
+        serializer = ReadRecipySerializer(instance=recipy, context=context)
         return Response(
             data=serializer.data,
             status=HTTPStatus.CREATED
@@ -111,7 +111,7 @@ class RecipyVeiwSet(viewsets.ModelViewSet):
             self.create_ingredients_for_recipy(recipy, ingredients)
 
         context = {'request': self.request}
-        serializer = ReadRecipySerializer(instance = recipy, context=context)
+        serializer = ReadRecipySerializer(instance=recipy, context=context)
         return Response(
             data=serializer.data,
             status=HTTPStatus.CREATED
@@ -252,7 +252,7 @@ class ShoppingCartViewSet(CreateDestroyViewSet):
 
 
 @api_view()
-def DownloadShoppingCart(request):
+def download_shopping_cart(request):
     baskets = Basket.objects.filter(user=request.user)
     cart_list = {}
     for basket in baskets:
