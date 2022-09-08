@@ -10,7 +10,7 @@ services:
       - .env
 
   backend:
-    image: in9var:foodgram
+    image: in9var/foodgram
     restart: always
     volumes:
       - static_value:/app/static/
@@ -21,7 +21,7 @@ services:
       - .env
 
   frontend:
-    image: in9var:foodgram_front
+    image: in9var/foodgram_front
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
