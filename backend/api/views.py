@@ -1,17 +1,14 @@
 from http import HTTPStatus
-from queue import Empty
 
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, viewsets
 from rest_framework.decorators import api_view
-from rest_framework.permissions import SAFE_METHODS
 from rest_framework.response import Response
 
 from recipys.models import Basket, Favorite, Ingredient, Recipy, Tag
 from users.models import Follow, User
-
 from .filter import IngredientFilter, RecipyFilter
 from .permissions import AdminPermission, AuthorOrReadOnly
 from .serializers import (BriefRecipySerializer, FavoriteSerializer,
@@ -84,7 +81,10 @@ class RecipyVeiwSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             tags = serializer.validated_data.pop('tags')
             ingredients = serializer.validated_data.pop('recipy')
-            recipy = Recipy.objects.create(author=author, **serializer.validated_data)
+            recipy = Recipy.objects.create(
+                author=author,
+                **serializer.validated_data
+            )
             recipy.tags.set(tags)
             self.create_ingredients_for_recipy(recipy, ingredients)
 
@@ -101,7 +101,10 @@ class RecipyVeiwSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             tags = serializer.validated_data.pop('tags')
             ingredients = serializer.validated_data.pop('recipy')
-            recipy = Recipy.objects.create(author=author, **serializer.validated_data)
+            recipy = Recipy.objects.create(
+                author=author,
+                **serializer.validated_data
+            )
             recipy = get_object_or_404(Recipy, id=self.kwargs.get('pk'))
             IngredientsForRecipy.objects.filter(recipy=recipy).delete()
             recipy.tags.set(tags)

@@ -42,11 +42,11 @@ class FollowSerializer(serializers.ModelSerializer):
     def get_is_subscribed(self, obj):
         user = self.context.get('request').user
         return (
-                user.is_authenticated
-                and Follow.objects.filter(
-                    user=user,
-                    author=obj.author
-                ).exists()
+            user.is_authenticated
+            and Follow.objects.filter(
+                user=user,
+                author=obj.author
+            ).exists()
         )
 
     def get_recipes(self, obj):
@@ -125,21 +125,21 @@ class ReadRecipySerializer(serializers.ModelSerializer):
     def get_is_favorited(self, obj):
         request = self.context.get('request')
         return (
-                    request.user.is_authenticated
-                    and Favorite.objects.filter(
-                        user=request.user,
-                        recipy_id=obj.id
-                    ).exists()
-            )
+            request.user.is_authenticated
+            and Favorite.objects.filter(
+                user=request.user,
+                recipy_id=obj.id
+            ).exists()
+        )
 
     def get_is_in_shopping_cart(self, obj):
         request = self.context.get('request')
         return (
-                request.user.is_authenticated
-                and Basket.objects.filter(
-                    user=request.user,
-                    recipy_id=obj.id
-                ).exists()
+            request.user.is_authenticated
+            and Basket.objects.filter(
+                user=request.user,
+                recipy_id=obj.id
+            ).exists()
         )
 
 
@@ -173,7 +173,7 @@ class PostRecipySerializer(serializers.ModelSerializer):
     def validate_cooking_time(self, value):
         if int(value) < 1:
             raise serializers.ValidationError(
-                    'Проверьте время приготовления')
+                'Проверьте время приготовления')
         return value
 
 
