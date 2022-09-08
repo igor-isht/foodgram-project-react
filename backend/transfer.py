@@ -2,7 +2,6 @@ import csv
 
 from recipys.models import Ingredient
 
-
 with open('ingredients.csv', newline='') as csvfile:
     reader = csv.reader(csvfile)
     for row in reader:
