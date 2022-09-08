@@ -10,7 +10,9 @@ services:
       - .env
 
   backend:
-    image: in9var/foodgram
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
     restart: always
     volumes:
       - static_value:/app/static/
