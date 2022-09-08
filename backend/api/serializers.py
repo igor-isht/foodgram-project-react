@@ -142,6 +142,7 @@ class ReadRecipySerializer(serializers.ModelSerializer):
                 ).exists()
         )
 
+
 class PostRecipySerializer(serializers.ModelSerializer):
     """ Для создания/редактирования рецептов. """
 
