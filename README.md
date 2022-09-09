@@ -49,7 +49,7 @@ docker-compose exec web python manage.py migrate
 docker-compose exec web python manage.py collectstatic --no-input
 
 ```
-Готова. Перейдите на [localhost](http://localhost) 
+Готово. Проект развернулся на [localhost](http://localhost) 
 
 
 ## Авторы
