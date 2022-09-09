@@ -21,7 +21,7 @@ services:
       - .env
 
   frontend:
-    image: in9var/foodgram_front
+    image: in9var/foodgram_front:2.0
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
