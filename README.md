@@ -16,6 +16,8 @@ Foodgram - API к онлайн-сервису рецептов/продукто�
 
 ### Как запустить проект:
 
+Необходимы командная оболочка bash и docker desktop.
+
 Клонировать репозиторий и перейти в него в командной строке:
 
 ```
@@ -30,7 +32,7 @@ cd foodgram-project-react/infra
 
 
 ```
-ENGINE=django.db.backends.postgresql     (+NAME, USER, PASSWORD, etc.)
+ENGINE=django.db.backends.postgresql     (+NAME, USER, PASSWORD, etc., в настройках заданы значения по умолчанию)
 
 SECRET_KEY='Your_secret_key'
 
