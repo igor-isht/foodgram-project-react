@@ -51,6 +51,8 @@ docker-compose exec web python manage.py collectstatic --no-input
 ```
 Готово. Проект развернулся на [localhost](http://localhost) 
 
+Список эндпойнтов на http://localhost/api/docs/
+
 
 ## Авторы
 
