@@ -8,7 +8,7 @@ Foodgram - API к онлайн-сервису рецептов/продукто�
 
 Доступен по адресу [yourfoodgram.sytes.net](http://yourfoodgram.sytes.net/)
 
-Логин администратора: admin@ya.ru Пароль: admin
+Документация на [yourfoodgram.sytes.net/api/docs/](http://yourfoodgram.sytes.net/api/docs/)
 
 
 Используемый стек: Python, DjangoREST, PostgreSQL, Nginx, Docker
