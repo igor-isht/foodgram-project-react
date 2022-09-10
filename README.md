@@ -32,11 +32,21 @@ cd foodgram-project-react/infra
 
 
 ```
-ENGINE=django.db.backends.postgresql     (+NAME, USER, PASSWORD, etc., в настройках заданы значения по умолчанию)
+DB_ENGINE=django.db.backends.postgresql
 
-SECRET_KEY='Your_secret_key'
+DB_NAME=postgres 
 
-DEBUG=True  (по желанию)
+POSTGRES_USER=postgres
+
+POSTGRES_PASSWORD=postgres
+
+DB_HOST=db
+
+DB_PORT=5432
+
+SECRET_KEY='Your_secret_key' 
+
+DEBUG=True  (не обязателен)
 ```
 
 
@@ -44,7 +54,7 @@ Cоздать образ и контейнеры:
 
 ```
 
-docker-compose up
+docker-compose up -d
 
 docker-compose exec backend python manage.py migrate
 
