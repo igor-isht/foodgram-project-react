@@ -46,9 +46,9 @@ Cоздать образ и контейнеры:
 
 docker-compose up
 
-docker-compose exec web python manage.py migrate
+docker-compose exec backend python manage.py migrate
 
-docker-compose exec web python manage.py collectstatic --no-input
+docker-compose exec backend python manage.py collectstatic --no-input
 
 ```
 Готово. Проект развернулся на [localhost](http://localhost) 
